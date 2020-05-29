@@ -66,25 +66,6 @@ Game.setup=function(){
   
   Render.add(player);
 
-  // tt.onTouchStart(res => {
-  //   this.touchtime=res.timeStamp;
-  // });
-  
-  // tt.onTouchEnd(res=>{
-  //   if(res.timeStamp-this.touchtime<5){
-  //     let bullet = new Sprite('bullet',Res.imgs['bullet'],this.player.x+this.player.w/2-10,this.player.y,20,25);
-  //     //碰撞检测
-  //     bullet.run=function(){
-  //       this.y-=5;
-  //     }
-  //     bullet.onCollide('obj',function(obj){
-  //       obj.die=true;
-  //       Game.score+=1;
-  //     });
-  //     Render.add(bullet);
-  //   }
-  // });
-
   tt.onTouchMove(res=>{
     this.player.vx=res.touches[0].clientX;
     this.player.vy=res.touches[0].clientY;
