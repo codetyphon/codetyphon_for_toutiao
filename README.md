@@ -9,38 +9,109 @@
 ```
 import {Res,Sprite,Render,Game,Width,Height} from './codetyphon.js';
 
-//添加图片资源
+Res.show_loading()
 Res.add_img('player','./images/player.png');
 Res.add_img('flyobj','./images/flyobj.png');
-//设置图片加载完毕后的函数
-Res.setup(function(){
+Res.add_img('bullet','./images/bullet.png');
 
+Game.setup=function(){
+
+  this.score=0;
+  
   let x = Width/2-25;
   let y = Height-50;
-  
-  //玩家精灵
-  let player = new Sprite(Res.imgs['player'],x,y,50,65);//x,y,width,height
-  
-  //敌机精灵
-  let obj = new Sprite(Res.imgs['flyobj'],x,0,50,50);
-
-  //游戏循环
-  Game.main(function(){
-    player.y-=2;
-    obj.y+=2;
-    //碰撞检测
-    player.collide(obj,function(){
-      Game.over();
-    });
-    Render.background('#000000');
-    Render.show(player);
-    Render.show(obj);
+  let player = new Sprite('player',Res.imgs['player'],x,y,50,65);//x,y,width,height
+  player.time=0;
+  //碰撞检测
+  player.onCollide('obj',function(){
+    Game.over();
   });
+
+  player.run=function(){
+    if(this.x<=0){
+      this.x=0;
+    }
+    if(this.x>=Width-this.w){
+      this.x=Width-this.h;
+    }
+    if(this.vx>this.x){
+      this.x+=5;
+    }
+    if(this.vx<this.x){
+      this.x-=5;
+    }
+    if(this.vy<this.y){
+      this.y-=5;
+    }
+    if(this.vy>this.y){
+      this.y+=5;
+    }
+    this.time+=1;
+    if(this.time>50){
+      let bullet = new Sprite('bullet',Res.imgs['bullet'],player.x+player.w/2-10,player.y,20,25);
+      //碰撞检测
+      bullet.run=function(){
+        this.y-=5;
+      }
+      bullet.onCollide('obj',function(obj){
+        obj.die=true;
+        Game.score+=1;
+      });
+      Render.add(bullet);
+      this.time=0;
+    }
+  }
+
+  this.player=player;
   
-  //启动游戏
-  Game.start();
+  Render.add(player);
+
+  // tt.onTouchStart(res => {
+  //   this.touchtime=res.timeStamp;
+  // });
   
-});
+  // tt.onTouchEnd(res=>{
+  //   if(res.timeStamp-this.touchtime<5){
+  //     let bullet = new Sprite('bullet',Res.imgs['bullet'],this.player.x+this.player.w/2-10,this.player.y,20,25);
+  //     //碰撞检测
+  //     bullet.run=function(){
+  //       this.y-=5;
+  //     }
+  //     bullet.onCollide('obj',function(obj){
+  //       obj.die=true;
+  //       Game.score+=1;
+  //     });
+  //     Render.add(bullet);
+  //   }
+  // });
+
+  tt.onTouchMove(res=>{
+    this.player.vx=res.touches[0].clientX;
+    this.player.vy=res.touches[0].clientY;
+  });
+
+  this.time=0;
+  Render.background('#000000');
+}
+
+Game.looping=function(){
+  
+  this.time+=1;
+  if(this.time>100){
+    let obj = new Sprite('obj',Res.imgs['flyobj'],0,0,50,50);
+    obj.randomX();
+    obj.run=function(){
+      this.y+=2;
+      if(this.y>=Height){
+        this.die=true;
+      }
+    }
+    Render.add(obj);
+    this.time=0;
+  }
+  
+  Render.text(this.score,20,50,"#fff");
+}
 ```
 
 ## 效果
